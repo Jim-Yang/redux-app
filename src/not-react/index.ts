@@ -1,3 +1,5 @@
+import { createStore, combineReducers, Middleware, Store, applyMiddleware } from 'redux'
+
 type Action = {
     type: ACTIONS,
     todo?: Todo,
@@ -16,43 +18,16 @@ type State = {
 }
 
 enum ACTIONS {
-    ADD_TODO,
-    REMOVE_TODO,
-    TOGGLE_TODO,
-    ADD_GOAL,
-    REMOVE_GOAL
+    ADD_TODO="ADD_TODO",
+    REMOVE_TODO="REMOVE_TODO",
+    TOGGLE_TODO="TOGGLE_TODO",
+    ADD_GOAL="ADD_GOAL",
+    REMOVE_GOAL="REMOVE_GOAL"
 }
 
 type Goal = {
     id: number,
     name: string
-}
-
-function createStore(reducer: any) {
-    let state: State
-    let listeners: any = []
-
-    const getState = () => state
-
-    const subscribe = (listener: Function) => {
-        listeners.push(listener)
-        return () => {
-            listeners = listeners.filter( (l: any) => l !== listener)
-        }
-    }
-
-    const dispatch = (action: Action) => {
-        // Call todos
-        state = reducer(state, action)
-        listeners.forEach((listener: any) => {listener()})
-        // Loop over listeners and invoke them
-    }
-
-    return {
-        getState,
-        subscribe,
-        dispatch
-    }
 }
 
 // Reducer for todos
@@ -88,13 +63,6 @@ function goals(goals: Goal[] = [], action: Action): Goal[]{
             return goals.filter(goal => (goal.id !== actionGoal.id))
         default:
             return goals
-    }
-}
-
-function app (state: State = {todos: [], goals: []}, action: Action){
-    return {
-        todos: todos(state.todos, action),
-        goals: goals(state.goals, action)
     }
 }
 
@@ -134,7 +102,34 @@ function removeGoalAction(goal: Goal): Action {
     }
 }
 
-const store = createStore(app)
+// Middleware
+const checker: Middleware = (store) => (next) => (action: Action) => {
+    if(action.type === ACTIONS.ADD_TODO){
+        if(action.todo) {
+            if(action.todo.name === "bitcoin"){
+                console.log("Unacceptable")
+                return
+            }
+        }
+    }
+    return next(action)
+}
+
+const logger: Middleware = (store) => (next) => (action: Action) => {
+    console.group(action.type)
+    console.log(`The current action: ${JSON.stringify(action)}`)
+    const result = next(action)
+    console.log(`The new state: ${JSON.stringify(result)}`)
+    console.groupEnd()
+    return result
+}
+
+
+// Actual code
+
+const store = createStore(combineReducers({
+    todos, goals
+}), applyMiddleware(checker, logger))
 
 const unsubscribe = store.subscribe(() => {
     console.log(`The new state is: ${ JSON.stringify(store.getState())}`)
@@ -161,4 +156,20 @@ store.dispatch(toggleTodoAction({
 store.dispatch(addGoalAction({
     id:1,
     name: 'Some goal'
+}))
+
+store.dispatch(addGoalAction({
+    id:2,
+    name: 'Another goal'
+}))
+
+store.dispatch(removeGoalAction({
+    id:2,
+    name: 'Another goal'
+}))
+
+store.dispatch(addTodoAction({
+    id:4,
+    name: 'bitcoin',
+    complete: false
 }))
