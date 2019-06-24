@@ -1,6 +1,7 @@
 type Action = {
     type: ACTIONS,
-    todo: Todo
+    todo?: Todo,
+    goal?: Goal
 }
 
 type Todo = {
@@ -10,14 +11,21 @@ type Todo = {
 }
 
 type State = {
-    todos: Todo[]
+    todos: Todo[],
+    goals: Goal[]
 }
 
 enum ACTIONS {
     ADD_TODO,
     REMOVE_TODO,
     TOGGLE_TODO,
-    ADD_GOAL
+    ADD_GOAL,
+    REMOVE_GOAL
+}
+
+type Goal = {
+    id: number,
+    name: string
 }
 
 function createStore(reducer: any) {
@@ -47,55 +55,110 @@ function createStore(reducer: any) {
     }
 }
 
-// Reducer Function
-function todos( state: State = {todos: []}, action: Action): State {
+// Reducer for todos
+function todos(todos: Todo[] = [], action: Action): Todo[] {
     const actionTodo = action.todo
     if(!actionTodo) {
-        return state
+        return todos
     }
     switch(action.type) {
         case ACTIONS.ADD_TODO:
-            return Object.assign({}, {todos: state.todos.concat(actionTodo)}) // Return new object with todo
+            return todos.concat(actionTodo) // Return new object with todo
         case ACTIONS.REMOVE_TODO:
-            return Object.assign({}, {todos: state.todos.filter( todo => (todo.id !== actionTodo.id))})
+            return todos.filter( todo => (todo.id !== actionTodo.id))
         case ACTIONS.TOGGLE_TODO:
-            return Object.assign({}, {todos: state.todos.map(todo => {
+            return todos.map(todo => {
                 return todo.id === actionTodo.id ? Object.assign({}, todo, { complete: !todo.complete }): todo
-            })})
+            })
+        default:
+            return todos
     }
-    
-    return state
 }
 
-const store = createStore(todos)
+// Reducer for goals
+function goals(goals: Goal[] = [], action: Action): Goal[]{
+    const actionGoal = action.goal
+    if(!actionGoal) {
+        return goals
+    }
+    switch(action.type){
+        case ACTIONS.ADD_GOAL:
+            return goals.concat(actionGoal)
+        case ACTIONS.REMOVE_GOAL:
+            return goals.filter(goal => (goal.id !== actionGoal.id))
+        default:
+            return goals
+    }
+}
+
+function app (state: State = {todos: [], goals: []}, action: Action){
+    return {
+        todos: todos(state.todos, action),
+        goals: goals(state.goals, action)
+    }
+}
+
+// Actions
+function addTodoAction(todo: Todo): Action {
+    return {
+        type: ACTIONS.ADD_TODO, 
+        todo
+    }
+}
+
+function toggleTodoAction(todo: Todo): Action {
+    return {
+        type: ACTIONS.TOGGLE_TODO,
+        todo
+    }
+}
+
+function removeTodoAction(todo: Todo): Action {
+    return {
+        type: ACTIONS.REMOVE_TODO,
+        todo
+    }
+}
+
+function addGoalAction(goal: Goal): Action {
+    return {
+        type: ACTIONS.ADD_GOAL,
+        goal
+    }
+}
+
+function removeGoalAction(goal: Goal): Action {
+    return {
+        type: ACTIONS.REMOVE_GOAL,
+        goal
+    }
+}
+
+const store = createStore(app)
 
 const unsubscribe = store.subscribe(() => {
     console.log(`The new state is: ${ JSON.stringify(store.getState())}`)
 })
 
-store.dispatch({
-    type: ACTIONS.ADD_TODO,
-    todo: {
-        id: 0,
-        name: 'Learn redux',
-        complete: false
-    }
-})
+store.dispatch(addTodoAction({
+    id: 0,
+    name: 'Learn redux',
+    complete: false
+}))
 
-store.dispatch({
-    type: ACTIONS.ADD_TODO,
-    todo: {
-        id: 1,
-        name: 'Learn react',
-        complete: false
-    }
-})
+store.dispatch(addTodoAction({
+    id: 1,
+    name: 'Learn react',
+    complete: false
+}))
 
-store.dispatch({
-    type: ACTIONS.TOGGLE_TODO,
-    todo: {
-        id: 1,
-        name: 'Learn react',
-        complete: false
-    }
-})
+store.dispatch(toggleTodoAction({
+    id: 1,
+    name: 'Learn react',
+    complete: false
+}))
+
+store.dispatch(addGoalAction({
+    id:1,
+    name: 'Some goal'
+}))
