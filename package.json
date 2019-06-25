@@ -37,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "redux-devtools-extension": "^2.13.8",
     "ts-node": "^8.3.0"
   }
 }
