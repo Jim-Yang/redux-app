@@ -34,3 +34,11 @@ export function removeGoalAction(goal: Goal): Action {
         goal
     }
 }
+
+export function receiveDataAction(goals: Goal[], todos: Todo[]): Action {
+    return {
+        type: ACTIONS.RECIEVE_DATA,
+        todos,
+        goals
+    }
+}

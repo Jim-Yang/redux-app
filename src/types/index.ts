@@ -2,6 +2,8 @@ export type Action = {
     type: ACTIONS,
     todo?: Todo,
     goal?: Goal
+    todos?: Todo[],
+    goals?: Goal[]
 }
 
 export type Todo = {
@@ -12,15 +14,17 @@ export type Todo = {
 
 export type State = {
     todos: Todo[],
-    goals: Goal[]
+    goals: Goal[],
+    loading: boolean
 }
 
 export enum ACTIONS {
-    ADD_TODO="ADD_TODO",
-    REMOVE_TODO="REMOVE_TODO",
-    TOGGLE_TODO="TOGGLE_TODO",
-    ADD_GOAL="ADD_GOAL",
-    REMOVE_GOAL="REMOVE_GOAL"
+    ADD_TODO = "ADD_TODO",
+    REMOVE_TODO = "REMOVE_TODO",
+    TOGGLE_TODO = "TOGGLE_TODO",
+    ADD_GOAL = "ADD_GOAL",
+    REMOVE_GOAL = "REMOVE_GOAL",
+    RECIEVE_DATA = "RECIEVE_DATA"
 }
 
 export type Goal = {
