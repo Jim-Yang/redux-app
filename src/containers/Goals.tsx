@@ -1,11 +1,12 @@
 import React from "react";
 import List from "../components/List";
 import { Store } from "redux";
-import { generateId } from "../utils";
-import { addGoalAction, removeGoalAction } from "../redux/actions";
 import { Goal } from "../types";
+import { GoalActions } from './../redux/actions/'
+import API from "../api";
 
 type GoalsProps = {
+    api: API
     store: Store
     goals: Goal[]
 }
@@ -25,17 +26,13 @@ export default class Goals extends React.Component<GoalsProps> {
         if(name === ''){
             return
         }
-
-        this.props.store.dispatch(addGoalAction({
-            id: generateId(),
-            name: name
-        }))
-
-        this.input.value = ''
+        // @ts-ignore
+        this.props.store.dispatch(GoalActions.handleAddGoal(name, this.props.api, () => { this.input.value = '' }))
     }
 
     removeItem = (item: Goal) => {
-        this.props.store.dispatch(removeGoalAction(item))
+        // @ts-ignore
+        this.props.store.dispatch(GoalActions.handleRemoveGoal(item, this.props.api))
     }
 
     render() {

@@ -1,11 +1,12 @@
 import React from 'react'
 import List from '../components/List';
 import { Store } from 'redux';
-import { addTodoAction, removeTodoAction, toggleTodoAction } from '../redux/actions'
-import { generateId } from '../utils'
-import { Todo, Goal } from '../types';
+import { TodoActions } from '../redux/actions'
+import { Todo } from '../types';
+import API from '../api';
 
 type TodosProp = {
+    api: API
     store: Store
     todos: Todo[]
 }
@@ -25,22 +26,18 @@ export default class Todos extends React.Component<TodosProp> {
         if(name === ''){
             return
         }
-
-        this.props.store.dispatch(addTodoAction({
-            id: generateId(),
-            complete: false,
-            name: name
-        }))
-
-        this.input.value = ''
+        // @ts-ignore
+        this.props.store.dispatch(TodoActions.handleSaveTodo(name, this.props.api, () => {this.input.value = ''}))
     }
 
     removeItem = (item: Todo) => {
-        this.props.store.dispatch(removeTodoAction(item))
+        // @ts-ignore
+        this.props.store.dispatch(TodoActions.handleDeleteTodo(item, this.props.api))
     }
 
     toggleItem = (item: Todo) => {
-        this.props.store.dispatch(toggleTodoAction(item))
+        // @ts-ignore
+        this.props.store.dispatch(TodoActions.handleToggleTodo(item, this.props.api))
     }
 
     render() {

@@ -1,12 +1,12 @@
-import { Action, ACTIONS } from "../../types";
+import { Action, TODO_ACTIONS } from "../../types";
 import { Middleware } from "redux";
 
 // Middleware
 export const checker: Middleware = (store) => (next) => (action: Action) => {
-    if(action.type === ACTIONS.ADD_TODO){
+    if(action.type === TODO_ACTIONS.ADD_TODO){
         if(action.todo) {
             if(action.todo.name === "bitcoin"){
-                console.log("Unacceptable")
+                alert("Unacceptable")
                 return
             }
         }

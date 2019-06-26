@@ -1,14 +1,14 @@
-import { Todo, Action, ACTIONS, Goal } from '../../types'
+import { Todo, Action, Goal, TodoAction, TODO_ACTIONS, GoalAction, GOAL_ACTIONS } from '../../types'
 
 // Reducer for todos
-export function todos(todos: Todo[] = [], action: Action): Todo[] {
+export function todos(todos: Todo[] = [], action: TodoAction): Todo[] {
     const actionTodo = action.todo
     switch(action.type) {
-        case ACTIONS.ADD_TODO:
+        case TODO_ACTIONS.ADD_TODO:
             return actionTodo ? todos.concat(actionTodo) : todos // Return new object with todo
-        case ACTIONS.REMOVE_TODO:
+        case TODO_ACTIONS.REMOVE_TODO:
             return actionTodo ? todos.filter( todo => (todo.id !== actionTodo.id)) : todos
-        case ACTIONS.TOGGLE_TODO:
+        case TODO_ACTIONS.TOGGLE_TODO:
             if(!actionTodo) {
                 return todos
              }
@@ -18,9 +18,8 @@ export function todos(todos: Todo[] = [], action: Action): Todo[] {
                 }
                 return todo
             })
-        case ACTIONS.RECIEVE_DATA:
+        case TODO_ACTIONS.RECIEVE_DATA:
                 const actionTodos = action.todos
-                console.log(actionTodos, "ACTION TODOS")
                 return actionTodos || todos
         default:
             return todos
@@ -28,14 +27,14 @@ export function todos(todos: Todo[] = [], action: Action): Todo[] {
 }
 
 // Reducer for goals
-export function goals(goals: Goal[] = [], action: Action): Goal[]{
+export function goals(goals: Goal[] = [], action: GoalAction): Goal[]{
     const actionGoal = action.goal
     switch(action.type){
-        case ACTIONS.ADD_GOAL:
+        case GOAL_ACTIONS.ADD_GOAL:
             return actionGoal ? goals.concat(actionGoal) : goals
-        case ACTIONS.REMOVE_GOAL:
+        case GOAL_ACTIONS.REMOVE_GOAL:
             return actionGoal ? goals.filter(goal => (goal.id !== actionGoal.id)) : goals
-        case ACTIONS.RECIEVE_DATA:
+        case GOAL_ACTIONS.RECIEVE_DATA:
             const actionGoals = action.goals
             return actionGoals || goals
         default:
@@ -47,7 +46,7 @@ export function goals(goals: Goal[] = [], action: Action): Goal[]{
 export function loading(loading: boolean = true, action: Action): boolean {
     switch(action.type){
         // Reminder that this action is dispatched when items are done loading
-        case ACTIONS.RECIEVE_DATA:
+        case TODO_ACTIONS.RECIEVE_DATA:
             return false
         default:
             return loading

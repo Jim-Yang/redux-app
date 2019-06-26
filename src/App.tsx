@@ -1,10 +1,8 @@
 import React from 'react';
-import logo from './logo.svg';
 import { store } from './redux/store'
-import List from './components/List'
 import { Todos, Goals } from './containers'
+import { DataActions } from './redux/actions'
 import API from './api';
-import { receiveDataAction } from './redux/actions';
 
 export default class App extends React.Component {
   api: API;
@@ -16,13 +14,8 @@ export default class App extends React.Component {
 
   componentDidMount(){
     store.subscribe( () => this.forceUpdate())
-    Promise.all([
-      this.api.fetchGoals(),
-      this.api.fetchTodos()
-    ]).then(([goals, todos]) => {
-      // Add to store
-      store.dispatch(receiveDataAction(goals, todos))
-    }).catch()
+    //@ts-ignore
+    store.dispatch(DataActions.handleReceiveData(this.api))
   }
 
   render(){
@@ -36,8 +29,8 @@ export default class App extends React.Component {
     return (
       <div className="App">
   
-        <Todos store={store} todos={todos}/>
-        <Goals store={store} goals={goals}/>
+        <Todos store={store} todos={todos} api={this.api}/>
+        <Goals store={store} goals={goals} api={this.api}/>
       </div>
     );
   }
