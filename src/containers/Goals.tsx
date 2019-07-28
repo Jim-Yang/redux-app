@@ -1,55 +1,51 @@
 import React from "react";
-import List from "../components/List";
-import { Store } from "redux";
+import { List } from "../components/List";
 import { Goal } from "../types";
-import { GoalActions } from './../redux/actions/'
+import { GoalActions } from "./../redux/actions/";
 import API from "../api";
+import { useStore } from "react-redux";
 
 type GoalsProps = {
-    api: API
-    store: Store
-    goals: Goal[]
-}
+  api: API;
+  goals: Goal[];
+};
 
-export default class Goals extends React.Component<GoalsProps> {
+export default function Goals(props: GoalsProps) {
+  let inputElement = {} as HTMLInputElement;
 
-    input: HTMLInputElement
+  const store = useStore();
 
-    constructor(props: GoalsProps) {
-        super(props)
-        this.input = {} as HTMLInputElement
+  const addItem = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    const name = inputElement.value;
+    if (name === "") {
+      return;
     }
+    store.dispatch(
+      // @ts-ignore
+      GoalActions.handleAddGoal(name, props.api, () => {
+        inputElement.value = "";
+      })
+    );
+  };
 
-    addItem = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>{
-        event.preventDefault()
-        const name = this.input.value
-        if(name === ''){
-            return
-        }
-        // @ts-ignore
-        this.props.store.dispatch(GoalActions.handleAddGoal(name, this.props.api, () => { this.input.value = '' }))
-    }
+  const removeItem = (item: Goal) => {
+    store.dispatch(
+      // @ts-ignore
+      GoalActions.handleRemoveGoal(item, props.api)
+    );
+  };
 
-    removeItem = (item: Goal) => {
-        // @ts-ignore
-        this.props.store.dispatch(GoalActions.handleRemoveGoal(item, this.props.api))
-    }
-
-    render() {
-        return (
-            <div>
-                <h1>Goals List</h1>
-                <input
-                    type='text'
-                    placeholder='Add Todo'
-                    ref={(input) => this.input = input!}
-                />
-                <button onClick={this.addItem}>Add Todo</button>
-                <List
-                    items={this.props.goals}
-                    remove={this.removeItem}
-                    />
-            </div>
-        )
-    }
+  return (
+    <div>
+      <h1>Goals List</h1>
+      <input
+        type="text"
+        placeholder="Add Todo"
+        ref={input => (inputElement = input!)}
+      />
+      <button onClick={addItem}>Add Todo</button>
+      <List items={props.goals} remove={removeItem} />
+    </div>
+  );
 }
